@@ -17,8 +17,7 @@
 1. 克隆或下载本项目代码：
 
 ```bash
-git clone https://github.com/yourusername/iztro-webapp.git
-cd iztro-webapp
+git clone 
 ```
 
 2. 安装依赖包：
