@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紫微斗数排盘工具</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .result-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a5276;
+            text-align: center;
+        }
+        h2 {
+            color: #2874a6;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #2874a6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1a5276;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tab-button {
+            padding: 10px 15px;
+            background-color: #ddd;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #2874a6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .tools-nav a {
+            background-color: #eaeaea;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tools-nav a:hover {
+            background-color: #d4d4d4;
+            transform: translateY(-2px);
+        }
+        .tools-nav a.active {
+            background-color: #2874a6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>紫微斗数排盘工具</h1>
+        
+        <div class="tools-nav">
+            <a href="index.html" class="active">排盘工具</a>
+            <a href="ai-prompt-generator.html">AI提示词生成器</a>
+        </div>
+        
+        <div class="input-section">
+            <h2>输入信息</h2>
+            <div class="form-group">
+                <label for="birth-type">日期类型</label>
+                <select id="birth-type">
+                    <option value="solar" selected>阳历</option>
+                    <option value="lunar">农历</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="birth-date">出生日期</label>
+                <input type="date" id="birth-date">
+            </div>
+            
+            <div id="lunar-options" style="display: none;">
+                <div class="form-group">
+                    <label for="is-leap-month">是否闰月</label>
+                    <select id="is-leap-month">
+                        <option value="false" selected>否</option>
+                        <option value="true">是</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="time-index">出生时辰</label>
+                <select id="time-index">
+                    <option value="0">早子时 (23:00-01:00)</option>
+                    <option value="1">丑时 (01:00-03:00)</option>
+                    <option value="2">寅时 (03:00-05:00)</option>
+                    <option value="3">卯时 (05:00-07:00)</option>
+                    <option value="4">辰时 (07:00-09:00)</option>
+                    <option value="5">巳时 (09:00-11:00)</option>
+                    <option value="6">午时 (11:00-13:00)</option>
+                    <option value="7">未时 (13:00-15:00)</option>
+                    <option value="8">申时 (15:00-17:00)</option>
+                    <option value="9">酉时 (17:00-19:00)</option>
+                    <option value="10">戌时 (19:00-21:00)</option>
+                    <option value="11">亥时 (21:00-23:00)</option>
+                    <option value="12">晚子时 (23:00-01:00)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">性别</label>
+                <select id="gender">
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="fix-leap">调整闰月</label>
+                <select id="fix-leap">
+                    <option value="true" selected>是 (闰月的前半个月算上个月，后半个月算下个月)</option>
+                    <option value="false">否</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="language">语言</label>
+                <select id="language">
+                    <option value="zh-CN" selected>简体中文</option>
+                    <option value="zh-TW">繁体中文</option>
+                    <option value="en-US">英文</option>
+                    <option value="ko-KR">韩文</option>
+                    <option value="ja-JP">日文</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="horoscope-date">运限日期</label>
+                <input type="date" id="horoscope-date" value="">
+            </div>
+            
+            <button id="calculate-btn">计算星盘</button>
+        </div>
+        
+        <div class="result-section">
+            <h2>星盘结果</h2>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="astrolabe">基本星盘</button>
+                    <button class="tab-button" data-tab="horoscope">运限</button>
+                    <button class="tab-button" data-tab="stars">流耀</button>
+                </div>
+                
+                <div id="astrolabe-tab" class="tab-content active">
+                    <pre id="astrolabe-result">请先计算星盘...</pre>
+                </div>
+                
+                <div id="horoscope-tab" class="tab-content">
+                    <pre id="horoscope-result">请先计算星盘...</pre>
+                </div>
+                
+                <div id="stars-tab" class="tab-content">
+                    <pre id="stars-result">请先计算星盘...</pre>
+                </div>
+            </div>
+            
+            <div class="export-buttons">
+                <button id="export-json" disabled>导出为JSON</button>
+                <button id="export-txt" disabled>导出为TXT</button>
+            </div>
+            
+            <p style="margin-top: 20px; text-align: center;">
+                导出数据后，可以使用 <a href="ai-prompt-generator.html">AI提示词生成器</a> 创建AI解析提示。
+            </p>
+        </div>
+    </div>
+    
+    <script src="dist/app.bundle.js"></script>
+</body>
+</html> 

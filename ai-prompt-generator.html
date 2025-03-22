@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紫微斗数AI提示词生成器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a5276;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2874a6;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #2874a6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1a5276;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-container input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-label {
+            display: block;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px dashed #ccc;
+        }
+        .template-selection {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .template-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            flex: 1;
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+        .template-card:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        .template-card.active {
+            border-color: #2874a6;
+            background-color: #eaf2f8;
+        }
+        .template-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .template-description {
+            font-size: 14px;
+            color: #666;
+        }
+        .key-info {
+            background-color: #eaf2f8;
+            border: 1px solid #d4e6f1;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .key-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .key-info li {
+            margin-bottom: 5px;
+        }
+        .toggle-section {
+            cursor: pointer;
+            user-select: none;
+        }
+        .toggle-section:hover {
+            color: #2874a6;
+        }
+        .toggle-section::before {
+            content: '▶';
+            display: inline-block;
+            margin-right: 5px;
+            transition: transform 0.3s;
+        }
+        .toggle-section.active::before {
+            transform: rotate(90deg);
+        }
+        .toggle-content {
+            display: none;
+            padding: 10px 0;
+        }
+        .toggle-content.active {
+            display: block;
+        }
+        .copy-message {
+            color: #27ae60;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .tools-nav a {
+            background-color: #eaeaea;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tools-nav a:hover {
+            background-color: #d4d4d4;
+            transform: translateY(-2px);
+        }
+        .tools-nav a.active {
+            background-color: #2874a6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>紫微斗数AI提示词生成器</h1>
+        
+        <div class="tools-nav">
+            <a href="index.html">排盘工具</a>
+            <a href="ai-prompt-generator.html" class="active">AI提示词生成器</a>
+        </div>
+        
+        <div class="card">
+            <h2>导入星盘数据</h2>
+            <div class="form-group">
+                <div class="file-input-container">
+                    <div class="file-input-label" id="file-label">点击这里上传星盘数据文件 (JSON 或 TXT)</div>
+                    <input type="file" id="file-input" accept=".json,.txt">
+                </div>
+            </div>
+            <p>或者直接粘贴星盘数据：</p>
+            <div class="form-group">
+                <textarea id="data-input" placeholder="在这里粘贴从紫微斗数排盘工具导出的JSON或TXT数据..."></textarea>
+            </div>
+            <button id="parse-data-btn">解析数据</button>
+            <div class="error-message" id="error-message"></div>
+        </div>
+        
+        <div class="card" id="key-info-card" style="display: none;">
+            <h2>星盘关键信息</h2>
+            <div class="key-info" id="key-info-content">
+                <!-- 这里会显示解析后的关键信息 -->
+            </div>
+        </div>
+        
+        <div class="card" id="prompt-card" style="display: none;">
+            <h2>选择提示词模板</h2>
+            <div class="template-selection" id="template-selection">
+                <div class="template-card" data-template="general">
+                    <div class="template-title">通用解析</div>
+                    <div class="template-description">全面解析紫微斗数命盘，包括主要特征和运势</div>
+                </div>
+                <div class="template-card" data-template="career">
+                    <div class="template-title">事业解析</div>
+                    <div class="template-description">重点解析事业和财运相关信息</div>
+                </div>
+                <div class="template-card" data-template="relationship">
+                    <div class="template-title">感情婚姻</div>
+                    <div class="template-description">详细分析感情、婚姻和人际关系状况</div>
+                </div>
+                <div class="template-card" data-template="health">
+                    <div class="template-title">健康解析</div>
+                    <div class="template-description">重点分析健康状况和潜在健康问题</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="additional-requirements">额外的要求或问题（可选）：</label>
+                <textarea id="additional-requirements" placeholder="例如：请特别关注我未来5年的财运变化..."></textarea>
+            </div>
+            
+            <button id="generate-prompt-btn">生成AI提示词</button>
+        </div>
+        
+        <div class="card" id="result-card" style="display: none;">
+            <h2>生成的AI提示词</h2>
+            <p>将以下提示词复制到您选择的AI聊天工具中以获取紫微斗数解析：</p>
+            <div class="form-group">
+                <textarea id="prompt-result" readonly></textarea>
+            </div>
+            <button id="copy-prompt-btn">复制提示词</button>
+            <div class="copy-message" id="copy-message">提示词已复制到剪贴板！</div>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <div class="toggle-section" id="advanced-toggle">高级设置</div>
+                <div class="toggle-content" id="advanced-content">
+                    <div class="form-group">
+                        <label for="prompt-template">自定义提示词模板：</label>
+                        <textarea id="prompt-template" placeholder="在这里编辑提示词模板..."></textarea>
+                    </div>
+                    <p>模板变量：{basic_info}, {palace_info}, {stars_info}, {horoscope_info}, {additional_requirements}</p>
+                    <button id="update-template-btn">更新提示词</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="dist/aiPromptGenerator.bundle.js"></script>
+</body>
+</html> 
